@@ -1,13 +1,27 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      background: #000;
-      height: 400vh;
+@font-face {
+  font-family: "Avant";
+  src: url("https://assets.codepen.io/383755/avant-garde.woff2") format("woff2");
+}
+
+body, html {
+      background: #e8e6de;
+      --elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --x: 0px;
+      --y: 0px;
+      --t: rgba(255, 255, 255, 0.001);
+      --lightest: #f897d5;
+      --light: #f567c2;
+      --dark: #755ad0;
+      --darkest: #1a2a6c;
+      height: 650vh; /* Aumentado para dar mais espaço ao globo */
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
       color: white;
     }
 
+    
     #main-window {
       position: relative; /* Importante para que o texto se alinhe a esta div */
     }
@@ -254,10 +268,244 @@
 
     .side-branding h1 {
         font-size: 5vw; /* Tamanho dinâmico */
-        font-weight: 800; /* Letras gordas para o destaque */
-        line-height: 1;
-        text-transform: lowercase; /* O vídeo usa muito minúsculas para estilo */
+  position: relative;
+  width: auto;
+  overflow: hidden;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  mix-blend-mode: darken;
+  z-index: 1;
+  margin: 0 -1rem;
+  &:last-of-type {
+    justify-content: start;
+  }
+  &:hover {
+    z-index: 2;
+  }
+  &:nth-of-type(2) {
+    --lightest: #ffd986;
+    --light: #fdbb2d;
+    --dark: #b21f1f;
+    --darkest: #1a2a6c;
+  }
+  .inner {
+    display: inline-block;
+    position: relative;
+    pointer-events: all;
+    z-index: 2;
+    cursor: pointer;
+    box-shadow: 0 0 0 500vmin #e8e6de;
+  }
+  .inner:hover {
+    &:active {
+      &:before {
+        background-size: 35% 60%, 100% 100%, 100%;
+      }
     }
+    &:before {
+      filter: blur(2px) brightness(1);
+      background-size: 0px 0px, 100% 100%, 100%;
+      transition: transform 0.5s var(--elastic),
+        background-size 0.25s ease-in-out;
+    }
+  }
+  .inner:before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: 0rem;
+    left: 0rem;
+    filter: blur(2px) brightness(0);
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0.25) 0%,
+        var(--t) 20%
+      ),
+      radial-gradient(
+        circle at center,
+        var(--lightest),
+        var(--light) 5%,
+        var(--dark) 30%,
+        var(--darkest) 50%
+      ),
+      var(--darkest);
+    background-size: 0px 0px, 0px 0px, 100%;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    opacity: 1;
+    mix-blend-mode: lighten;
+    z-index: 2;
+    transition: transform 0.5s var(--elastic), background-size 0.25s ease-in-out,
+      filter 0.5s ease-in-out;
+    transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%));
+    z-index: 2;
+    pointer-events: none;
+  }
+  button {
+    padding: 3.5rem 6rem;
+    border: none;
+    font-size: 1.5rem;
+    position: relative;
+    background: transparent;
+    color: #fff;
+    z-index: 2;
+    cursor: pointer;
+    font-weight: 100;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: "Avant", "Futura", sans-serif;
+    text-shadow: clamp(-8px, calc((var(--width) / 2 - var(--x)) / 8), 8px)
+      clamp(-8px, calc((var(--height) / 2 - var(--y)) / 8), 8px) 12px
+      rgba(0, 0, 0, 0);
+    transition: text-shadow 500ms var(--elastic);
+    &:hover {
+      --shadow: max(
+        calc(
+          (var(--width) / 2 - var(--x)) / 8 +
+            ((var(--height) / 2 - var(--y)) / 3)
+        ),
+        calc(
+          (
+              ((var(--width) / 2 - var(--x)) / 8) +
+                ((var(--height) / 2 - var(--y)) / 3)
+            ) * -1
+        ),
+        5px
+      );
+      text-shadow: clamp(-6px, calc((var(--width) / 2 - var(--x)) / 12), 6px)
+        clamp(-4px, calc((var(--height) / 2 - var(--y)) / 16), 4px)
+        var(--shadow) #000;
+    }
+    &:hover ~ .blob {
+      &:before {
+        transition: transform 500ms var(--elastic),
+          box-shadow 1000ms var(--elastic);
+        transform: translate(
+            clamp(5%, calc(var(--x) - 50%), 550%),
+            clamp(1rem, calc(var(--y) - 50%), 5rem)
+          )
+          scale(1.25);
+        box-shadow: 0 0 0 0.05rem #fff, 0 -6rem 0 1.25rem #fff,
+          0 6rem 0 1.25rem #fff;
+      }
+    }
+    &:active {
+      cursor: grab;
+    }
+    &:active:hover ~ .blob {
+      &:before {
+        box-shadow: 0 0 0 0rem #fff, 0 -5rem 0 1.75rem #fff,
+          0 5rem 0 1.75rem #fff;
+        transition: transform 500ms var(--elastic),
+          box-shadow 500ms var(--elastic);
+        transform: translate(
+            clamp(5%, calc(var(--x) - 50%), 550%),
+            clamp(calc(50% + 1rem), calc(var(--y) - 50%), calc(50% + 1.5rem))
+          )
+          scale(1);
+      }
+    }
+  }
+  .blob {
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #fff;
+    filter: blur(12px) contrast(25);
+    z-index: 1;
+    &:before,
+    &:after {
+      content: "";
+      position: absolute;
+      background: blue;
+    }
+    &:before {
+      width: 15%;
+      height: auto;
+      z-index: 2;
+      transition: transform 750ms var(--elastic),
+        box-shadow 500ms var(--elastic);
+      aspect-ratio: 1/1;
+      box-shadow: 0 0 0 0.75rem #fff, 0 -8rem 0 -2rem #fff, 0 8rem 0 -2rem #fff;
+      left: 0;
+      top: 0;
+      border-radius: 100%;
+      transform: translate(
+          clamp(10%, calc(var(--x) - 50%), 550%),
+          clamp(1rem, calc(var(--y) - 50%), 5rem)
+        )
+        scale(0);
+    }
+    &:after {
+      width: calc(100% - 4rem);
+      height: calc(100% - 4rem);
+      top: 2rem;
+      left: 2rem;
+      border-radius: 5rem;
+      box-shadow: 0 0 0 8rem #fff;
+    }
+  }
+}
+
+
+/* 1. Removemos o filtro de contraste do container para parar de "borrar" tudo */
+#globe-container {
+    background: #000;
+    filter: none !important; /* Mata a mancha branca */
+}
+
+/* 2. Estilo do Botão - Glassmorphism */
+.button-wrapper {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    z-index: 10002;
+}
+
+.button-wrapper button {
+    padding: 1.2rem 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    background: rgba(129, 83, 22, 0.404); /* Fundo quase transparente */
+    backdrop-filter: blur(10px); /* Efeito de vidro */
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: "Avant", sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* 3. O efeito de brilho (substitui o blob branco) */
+.blob {
+    position: absolute;
+    inset: 0;
+    border-radius: 100px;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(
+        circle at var(--x) var(--y), 
+        rgba(255, 8, 0, 0.15) 0%, 
+        transparent 50%
+    );
+    transition: opacity 0.3s;
+    opacity: 0;
+}
+
+.button-wrapper:hover .blob {
+    opacity: 1;
+}
+
+.button-wrapper:hover button {
+    border-color: rgba(255, 8, 0, 0.15);
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+}
 
     /* Posicionamento aleatório para parecer o vídeo */
     .w1 { top: 10%; left: 5%; font-size: 12vw; }
@@ -265,6 +513,8 @@
     .w3 { top: 40%; left: 15%; opacity: 0.05; }
     .w4 { bottom: 10%; left: 20%; }
     .w5 { top: 20%; right: 5%; }
+
+    
 
 
    

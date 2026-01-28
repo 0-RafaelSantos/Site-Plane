@@ -2,11 +2,13 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/GLTFLoader.js';
 
-let scene, camera, renderer, planeModel;
+let camera, renderer, planeModel;
+
+export const scene = new THREE.Scene();
 
 export function initPlane3D() {
     const canvas = document.getElementById('plane-canvas');
-    scene = new THREE.Scene();
+    
 
     // Câmara no topo olhando para baixo
     camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
