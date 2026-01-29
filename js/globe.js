@@ -120,6 +120,9 @@ export function createGlobe(container) {
 
     // Animation loop
     let animationId;
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    
     function animate() {
         animationId = requestAnimationFrame(animate);
         
@@ -133,6 +136,51 @@ export function createGlobe(container) {
         renderer.render(scene, camera);
     }
     animate();
+
+    // Raycasting para detectar cliques nos pinos
+    container.addEventListener('click', function(event) {
+        // Calcular posição do mouse em coordenadas normalizadas (-1 a +1)
+        const rect = container.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        // Atualizar raycaster
+        raycaster.setFromCamera(mouse, camera);
+        
+        // Obter todos os pinos (filhos do earth)
+        const pins = [];
+        earth.traverse(function(child) {
+            if (child.userData && child.userData.locationId) {
+                pins.push(child);
+            }
+        });
+        
+        console.log('Pins found for raycasting:', pins.length);
+        
+        // Verificar interseções
+        const intersects = raycaster.intersectObjects(pins, true); // true para recursive
+        
+        console.log('Raycaster intersects:', intersects.length);
+        
+        if (intersects.length > 0) {
+            let clickedPin = intersects[0].object;
+            
+            // Se o objeto clicado não tiver userData, procurar no parent
+            while (clickedPin && !clickedPin.userData.locationId) {
+                clickedPin = clickedPin.parent;
+            }
+            
+            if (clickedPin && clickedPin.userData.location) {
+                const location = clickedPin.userData.location;
+                console.log('Pin clicked:', location.name);
+                
+                // Mostrar menu de contexto
+                if (window.showPinContextMenu) {
+                    window.showPinContextMenu(location, event.clientX, event.clientY);
+                }
+            }
+        }
+    });
 
     // Resize handler
     const handleResize = () => {
