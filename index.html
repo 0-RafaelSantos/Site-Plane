@@ -24,15 +24,21 @@
 
 <body>
 
-  <header>
-    <div class="logo">FLY.AWAY</div>
-    <nav>
-      <a href="#">Expedições</a>
-      <a href="#">Frota</a>
-      <a href="#">Reservar</a>
-    </nav>
-    
-  </header>
+  <header class="main-header">
+  <nav class="nav-left">
+    <a href="#expedicoes">Expedições</a>
+    <a href="#frota">Frota</a>
+    <a href="#reservar">Reservar</a>
+  </nav>
+
+  <div class="logo">Rafael Santos</div>
+
+  <nav class="nav-right">
+    <a href="#destinos">Destinos</a>
+    <a href="#clube">VIP Club</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+</header>
 
   <div class="side-branding left">
     <h1>WE ARE</h1>
@@ -52,6 +58,8 @@
       <div class="window-glow"></div>
 
       <div class="window-frame">
+        <div class="inner-frame"></div>
+        <div class="window-shade" id="airplane-shade"></div>
         <div class="view">
           <video autoplay muted loop playsinline>
             <source src="Video_nuvens.mp4" type="video/mp4">
@@ -61,7 +69,6 @@
       </div>
 
       <div class="content-overlay" id="window-text">
-        <h1 id="stratosphere-text">Rafael Santos</h1>
         <span class="scroll-hint">SCROLL TO ENTER</span>
       </div>
     </div>

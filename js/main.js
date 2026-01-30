@@ -394,16 +394,10 @@ document.addEventListener('keydown', function(e) {
 
 const mainWindow = document.getElementById('main-window');
 const plane = document.getElementById('plane');
-
-const bgTitle = document.getElementById('bg-title');
 const header = document.querySelector('header');
+const bgTitle = document.getElementById('bg-title');
 
-
-initPlane3D();
-
-// Carregar localizações do localStorage ao iniciar
-loadLocationsFromStorage();
-
+// Adicionar evento de scroll para animar o título de fundo
 // Criar container para o globo
 const globeContainer = document.createElement('div');
 globeContainer.id = 'globe-container';
@@ -448,7 +442,6 @@ buttonWrapper.addEventListener('mousemove', (e) => {
     buttonWrapper.style.setProperty('--height', `${rect.height}px`);
 });
 
-
 // Adicionar mouse tracking para todos os elementos .inner existentes
 
 // Inicializar globo
@@ -458,33 +451,76 @@ let globeVisible = false;
 window.addEventListener('scroll', () => {
   const scroll = window.scrollY;
   const vh = window.innerHeight;
+  const shade = document.getElementById('airplane-shade');
+  const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+
+  // Tampa da janela
+  if (scrollPercent > 0.1) {
+    shade.style.height = "100%";
+  } else {
+    shade.style.height = "20%";
+  }  
+
+  // Logo animado
+  const logo = document.querySelector('.main-header .logo');
+  if (logo) {
+    // Verificar se já chegou ao topo alguma vez
+    if (!logo.dataset.reachedTop) {
+      logo.dataset.reachedTop = 'false';
+    }
+        
+    // 1. Posição Vertical (sobe mais rápido ainda: de 50% para 5%)
+    const newTop = Math.max(5, 50 - (scrollPercent * 80)); // Aumentado de 60 para 80
+        
+    // 2. Tamanho da Fonte (ajustado para começar de 1rem como no CSS)
+    const newSize = Math.max(0.8, 1 - (scrollPercent * 0.4));
+        
+    // 3. Espaçamento de letras (de 8px para 4px)
+    const newSpacing = Math.max(4, 8 - (scrollPercent * 4));
+
+    // Se chegou ao topo, fica fixo lá permanentemente
+    if (newTop <= 5 && logo.dataset.reachedTop === 'false') {
+      logo.dataset.reachedTop = 'true';
+      logo.style.top = '5%';
+      logo.style.fontSize = '0.8rem';
+      logo.style.letterSpacing = '4px';
+      logo.style.transition = 'none'; // Remove transição quando fixo
+    } else if (logo.dataset.reachedTop === 'false') {
+      // Ainda não chegou ao topo, move normalmente
+      logo.style.top = `${newTop}%`;
+      logo.style.fontSize = `${newSize}rem`;
+      logo.style.letterSpacing = `${newSpacing}px`;
+      logo.style.transition = 'top 0.3s ease-out, font-size 0.3s ease-out, letter-spacing 0.3s ease-out';
+    }
+    // Se já chegou ao topo, não faz nada (mantém fixo)
+  }
+
+  // Navegação - sempre visível
+  const navs = document.querySelectorAll('.main-header nav');
+  navs.forEach(nav => {
+    nav.style.opacity = "1"; // Sempre visível
+    nav.style.transition = "opacity 0.5s ease";
+  });
   
   // FASE 1: JANELA
   const progress1 = Math.min(scroll / vh, 1);
   mainWindow.style.transform = `scale(${1 + progress1 * 12})`;
   mainWindow.style.opacity = `${1 - progress1 * 1.5}`;
 
-  // FASE 2: AVIÃO (Margem de segurança de 1.1vh)
+  // FASE 2: AVIÃO
   const progress2 = Math.max(0, (scroll - vh * 1.1) / (vh * 4)); 
-
-  // FASE 3: DIVISÃO DO GLOBO (A partir de 450vh)
   const progressGlobe = Math.max(0, (scroll - vh * 4.5) / (vh * 1.5));
 
   const sceneEl = document.querySelector('.scene');
-  const items = document.querySelectorAll('.dest-item'); // Selecionar aqui para usar no reset
+  const items = document.querySelectorAll('.dest-item');
 
   if (progress2 > 0) {
-    // 1. O avião aparece e desaparece no fim
     plane.style.opacity = progress2 < 0.8 ? 1 : 1 - (progress2 - 0.8) * 5;
-
     updatePlaneOnScroll(progress2);
-
-    // 2. Título TAKE OFF: Escuro e visível
     bgTitle.style.opacity = progress2 < 0.9 ? "0.9" : "0";
     bgTitle.style.color = "#000";
     bgTitle.style.transform = `scale(${2 - progress2})`;
 
-    // 3. Ativação dos destinos
     items.forEach((item, index) => {
       const start = index * 0.3;
       if (progress2 > start && progress2 < start + 0.25) {
@@ -496,93 +532,70 @@ window.addEventListener('scroll', () => {
     
     sceneEl.classList.add('bright');
   } else {
-    // --- RESET TOTAL ---
-    
-    // Esconde o avião e o título imediatamente
     plane.style.opacity = "0";
     bgTitle.style.opacity = "0";
-    
-    // CORREÇÃO MALDIVAS: Força todos os destinos a desaparecer no scroll para cima
     items.forEach(item => {
       item.classList.remove('active');
     });
-
-    // CORREÇÃO FUNDO BRANCO: 
-    // Removemos o 'bright' mal o utilizador saia da fase do avião (progress2 <= 0)
-    // Isso garante que a janela (fase 1) tenha sempre o fundo original (escuro)
     sceneEl.classList.remove('bright');
   }
 
-    const brandingLeft = document.querySelector('.side-branding.left');
-    const brandingRight = document.querySelector('.side-branding.right');
+  const brandingLeft = document.querySelector('.side-branding.left');
+  const brandingRight = document.querySelector('.side-branding.right');
 
-    // progress1 controla o zoom da janela (0 a 1)
-    if (progress1 > 0) {
-        const moveX = progress1 * 400; // Velocidade da fuga lateral
-        const fadeOut = 1 - (progress1 * 1.8); // Desaparece um pouco antes do avião chegar
+  if (progress1 > 0) {
+    const moveX = progress1 * 400;
+    const fadeOut = 1 - (progress1 * 1.8);
 
-        // Mantemos a posição vertical definida no CSS e apenas mexemos no X
-        brandingLeft.style.transform = `translateX(-${moveX}px)`;
-        brandingLeft.style.opacity = fadeOut;
+    brandingLeft.style.transform = `translateX(-${moveX}px)`;
+    brandingLeft.style.opacity = fadeOut;
+    brandingRight.style.transform = `translateX(${moveX}px)`;
+    brandingRight.style.opacity = fadeOut;
+  } else {
+    brandingLeft.style.transform = `translateX(0)`;
+    brandingLeft.style.opacity = 1;
+    brandingRight.style.transform = `translateX(0)`;
+    brandingRight.style.opacity = 1;
+  }
 
-        brandingRight.style.transform = `translateX(${moveX}px)`;
-        brandingRight.style.opacity = fadeOut;
-    } else {
-        // Reset quando volta ao topo
-        brandingLeft.style.transform = `translateX(0)`;
-        brandingLeft.style.opacity = 1;
-        brandingRight.style.transform = `translateX(0)`;
-        brandingRight.style.opacity = 1;
+  if (progressGlobe > 0) {
+    bgTitle.style.opacity = Math.max(0, 0.9 - progressGlobe * 4);
+    bgTitle.style.pointerEvents = "none";
+
+    if (plane) plane.style.opacity = Math.max(0, 1 - progressGlobe * 3);
+
+    if (header) {
+      header.style.opacity = Math.max(0, 1 - progressGlobe * 2);
+      header.style.pointerEvents = progressGlobe > 0.5 ? 'none' : 'auto';
     }
 
-    if (progressGlobe > 0) {
-        // 1. FAZER O TAKE OFF DESAPARECER TOTALMENTE
-        bgTitle.style.opacity = Math.max(0, 0.9 - progressGlobe * 4); 
-        bgTitle.style.pointerEvents = "none";
-
-        // 2. ESCONDER O AVIÃO
-        if (plane) plane.style.opacity = Math.max(0, 1 - progressGlobe * 3);
-
-        // 3. ESCONDER HEADER SUAVEMENTE
-        if (header) {
-            header.style.opacity = Math.max(0, 1 - progressGlobe * 2);
-            header.style.pointerEvents = progressGlobe > 0.5 ? 'none' : 'auto';
-        }
-
-        // 4. MOSTRAR GLOBO
-        if (!globeVisible && progressGlobe > 0.1) {
-            globeScene = createGlobe(globeContainer);
-            globeVisible = true;
-            
-            // Recarregar pinos existentes se houver
-            reloadAllPins();
-        }
-
-        if (globeScene && globeContainer) {
-            globeContainer.style.opacity = Math.min(progressGlobe * 2, 1);
-            globeContainer.style.pointerEvents = 'auto';
-            
-            // Mostrar botão quando o globo estiver visível
-            if (progressGlobe > 0.3) {
-                buttonWrapper.style.opacity = '1';
-                buttonWrapper.style.visibility = 'visible';
-            }
-        }
-    } else {
-        // Esconder globo quando volta para cima
-        if (globeContainer) {
-            globeContainer.style.opacity = 0;
-            globeContainer.style.pointerEvents = 'none';
-        }
-        
-        // Esconder botão
-        buttonWrapper.style.opacity = '0';
-        buttonWrapper.style.visibility = 'hidden';
-        
-        // Restaurar header
-        if (header) {
-            header.style.opacity = 1;
-            header.style.pointerEvents = 'auto';
-        }
+    if (!globeVisible && progressGlobe > 0.1) {
+      globeScene = createGlobe(globeContainer);
+      globeVisible = true;
+      reloadAllPins();
     }
+
+    if (globeScene && globeContainer) {
+      globeContainer.style.opacity = Math.min(progressGlobe * 2, 1);
+      globeContainer.style.pointerEvents = 'auto';
+      
+      if (progressGlobe > 0.3) {
+        buttonWrapper.style.opacity = '1';
+        buttonWrapper.style.visibility = 'visible';
+      }
+    }
+  } else {
+    if (globeContainer) {
+      globeContainer.style.opacity = 0;
+      globeContainer.style.pointerEvents = 'none';
+    }
+    
+    buttonWrapper.style.opacity = '0';
+    buttonWrapper.style.visibility = 'hidden';
+    
+    if (header) {
+      header.style.opacity = 1;
+      header.style.pointerEvents = 'auto';
+    }
+  }
 });
