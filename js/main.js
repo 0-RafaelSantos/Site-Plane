@@ -1,6 +1,16 @@
 import { initPlane3D, updatePlaneOnScroll } from './plane3d.js';
 import { createGlobe } from './globe.js';
 
+// Inicialização quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing plane...');
+    // Inicializar o avião 3D
+    initPlane3D();
+    
+    // Carregar localizações do storage
+    loadLocationsFromStorage();
+});
+
 // 1. FORÇAR VOLTAR AO INÍCIO NO REFRESH
 if (history.scrollRestoration) {
     history.scrollRestoration = 'manual';
@@ -599,3 +609,20 @@ window.addEventListener('scroll', () => {
     }
   }
 });
+
+// Função para fazer scroll para a parte do globo
+function scrollToGlobe(event) {
+    event.preventDefault();
+    
+    // Calcular a posição do globo (mais para baixo - aproximadamente 5.5x a altura da janela)
+    const globePosition = window.innerHeight * 5.5;
+    
+    // Scroll suave para o globo
+    window.scrollTo({
+        top: globePosition,
+        behavior: 'smooth'
+    });
+}
+
+// Disponibilizar a função globalmente
+window.scrollToGlobe = scrollToGlobe;

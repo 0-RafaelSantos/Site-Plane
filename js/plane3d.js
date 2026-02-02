@@ -9,6 +9,12 @@ export const scene = new THREE.Scene();
 export function initPlane3D() {
     const canvas = document.getElementById('plane-canvas');
     
+    if (!canvas) {
+        console.error('Plane canvas not found!');
+        return;
+    }
+    
+    console.log('Initializing plane 3D with canvas:', canvas);
 
     // Câmara no topo olhando para baixo
     camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
@@ -30,7 +36,9 @@ export function initPlane3D() {
     scene.add(sun);
 
     const loader = new GLTFLoader();
+    console.log('Loading plane model: Jet.glb');
     loader.load('Jet.glb', (gltf) => {
+        console.log('Plane model loaded successfully:', gltf);
         planeModel = gltf.scene;
       
         planeModel.traverse((node) => {
