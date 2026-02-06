@@ -35,8 +35,7 @@
 
   <nav class="nav-right">
     <a href="#destinos" onclick="scrollToGlobe(event)">Destinos</a>
-    <a href="#clube">VIP Club</a>
-    <a href="#contacto">Contacto</a>
+    <a href="#contacto" onclick="toggleContactFooter(event)">Contacto</a>
   </nav>
 </header>
 
@@ -89,6 +88,58 @@
   </div>
 
   </div>
+
+  <!-- Footer de Contacto -->
+  <footer id="contact-footer" class="contact-footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Contactos</h3>
+        <div class="contact-info">
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <span>+351 912 345 678</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <span>rafael.santos@example.com</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Lisboa, Portugal</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Redes Sociais</h3>
+        <div class="social-links">
+          <a href="https://www.linkedin.com/in/rafael-santos-734650325/" class="social-link">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="https://github.com/0-RafaelSantos" class="social-link">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Acerca de</h3>
+        <ul class="services-list">
+          <li>Frontend Developer</li>
+          <li>Backend Developer</li>
+          <li>AI Enthusiast</li>
+          <li>Cloud Engineer</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 Rafael Santos. Todos os direitos reservados.</p>
+      <button class="close-footer" onclick="toggleContactFooter()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </footer>
 
   <!-- Modal Form -->
   <div id="locationModal" class="modal">

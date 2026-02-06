@@ -626,3 +626,40 @@ function scrollToGlobe(event) {
 
 // Disponibilizar a função globalmente
 window.scrollToGlobe = scrollToGlobe;
+
+// Função para mostrar/ocultar o footer de contacto
+function toggleContactFooter(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    const footer = document.getElementById('contact-footer');
+    const isActive = footer.classList.contains('active');
+    
+    if (isActive) {
+        footer.classList.remove('active');
+        // Fechar com animação suave
+        setTimeout(() => {
+            footer.style.bottom = '-100%';
+        }, 10);
+    } else {
+        footer.classList.add('active');
+        // Abrir com animação suave
+        setTimeout(() => {
+            footer.style.bottom = '0';
+        }, 10);
+    }
+}
+
+// Disponibilizar a função globalmente
+window.toggleContactFooter = toggleContactFooter;
+
+// Adicionar evento ESC para fechar o footer
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const footer = document.getElementById('contact-footer');
+        if (footer && footer.classList.contains('active')) {
+            toggleContactFooter();
+        }
+    }
+});
